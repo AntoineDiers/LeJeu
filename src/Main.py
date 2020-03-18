@@ -10,7 +10,6 @@ while running:
     spritesHandler.displaySprite("player.png",pos)
 
     keys=pygame.key.get_pressed()
-    print(keys)
     if keys[pygame.K_w]:
         pos = (pos[0],pos[1]-1)
     if keys[pygame.K_s]:
@@ -21,8 +20,6 @@ while running:
         pos = (pos[0]+1,pos[1])
 
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            print(event.unicode)
         if event.type == pygame.QUIT:
             running = False
     spritesHandler.drawFrame()
