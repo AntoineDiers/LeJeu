@@ -16,7 +16,7 @@ class SpritesHandler:
     def __init__(self):
         self.loadedSprites = {}
         pygame.init()
-        self.screen = pygame.display.set_mode((screenWidth, screenHeight),pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((screenWidth, screenHeight))#,pygame.FULLSCREEN)
 
     def displaySprite(self, filename, pos, angle = 0, size = None, alpha = None):
 
