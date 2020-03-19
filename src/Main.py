@@ -1,13 +1,14 @@
 from Display.SpritesHandler import *
 
-spritesHandler = SpritesHandler()
+spritesHandler = SpritesHandlerSingleton()
 
 pos = (0,0)
+angle = 0
 
 running = True
 while running:
     spritesHandler.displaySprite("bg.png",(0,0))
-    spritesHandler.displaySprite("player.png",pos)
+    spritesHandler.displaySprite("player.png",pos,angle)
 
     keys=pygame.key.get_pressed()
     if keys[pygame.K_w]:
@@ -18,6 +19,11 @@ while running:
         pos = (pos[0]-1,pos[1])
     if keys[pygame.K_d]:
         pos = (pos[0]+1,pos[1])
+
+    if keys[pygame.K_q]:
+        angle += 0.06
+    if keys[pygame.K_e]:
+        angle -= 0.06
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
