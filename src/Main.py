@@ -21,9 +21,9 @@ while running:
         pos = (pos[0]+1,pos[1])
 
     if keys[pygame.K_q]:
-        angle += 0.06
+        angle += 0.2
     if keys[pygame.K_e]:
-        angle -= 0.06
+        angle -= 0.2
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
