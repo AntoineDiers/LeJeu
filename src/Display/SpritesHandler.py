@@ -1,7 +1,5 @@
 import pygame
-
-screenWidth = 1920
-screenHeight = 1080
+from GlobalVariables import *
 
 class Sprite:
     def __init__(self, filename):
@@ -17,7 +15,7 @@ class SpritesHandlerSingleton:
         def __init__(self):
             self.loadedSprites = {}
             pygame.init()
-            self.screen = pygame.display.set_mode((screenWidth, screenHeight))#,pygame.FULLSCREEN)
+            self.screen = pygame.display.set_mode((screenWidthPix, screenHeightPix))#,pygame.FULLSCREEN)
 
         def blitRotate(self, image, pos, originPos, angle):
 
@@ -65,11 +63,14 @@ class SpritesHandlerSingleton:
 
         def drawFrame(self):
             pygame.display.flip()
+            spritesToRemove = []
             for sprite in self.loadedSprites:
                 if not self.loadedSprites[sprite].usedThisFrame:
-                    self.loadedSprites.pop(sprite)
+                    spritesToRemove.append(sprite)
                 else:
                     self.loadedSprites[sprite].usedThisFrame = False
+            for sprite in spritesToRemove:
+                self.loadedSprites.pop(sprite)
     instance = None
     def __init__(self):
         if not SpritesHandlerSingleton.instance:
