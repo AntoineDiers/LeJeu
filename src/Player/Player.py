@@ -13,6 +13,7 @@ class Player:
         self.pos = pos
         self.vel = [0,0]
         self.force = [0,0]
+        self.arm_pos = [0,0]
         self.angle = 0
         self.mass = 200
         self.airResistance = 10
@@ -76,4 +77,7 @@ class Player:
         self.render()
 
     def render(self):
-        self.spritesHandler.displaySprite("player.png",self.pos,self.angle)
+        self.spritesHandler.displaySprite("/character/perso_corps.png",self.pos,0)
+        self.arm_pos[0] = self.pos[0] - 0.3
+        self.arm_pos[1] = self.pos[1] + 0.6
+        self.spritesHandler.displaySprite("/character/perso_bras.png",self.arm_pos,self.angle)

@@ -16,7 +16,7 @@ class SpritesHandlerSingleton:
     class SpritesHandler:
         def __init__(self):
             self.loadedSprites = {}
-            self.screen = pygame.display.set_mode((screenWidthPix, screenHeightPix),pygame.FULLSCREEN)
+            self.screen = pygame.display.set_mode((screenWidthPix, screenHeightPix))#,pygame.FULLSCREEN)
             self.cameraHandler = CameraHandlerSingleton(None)
 
         def rotate(self, image, pos, originPos, angle):

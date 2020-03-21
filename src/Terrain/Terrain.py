@@ -14,7 +14,7 @@ class Floor:
         self.pos = pos
         self.collisionDirections = [CollisionDirection.UP]
     def render(self,spriteHandler):
-        spriteHandler.displaySprite("tile.png",self.pos)
+        spriteHandler.displaySprite("terrain/tile.png",self.pos)
 
 class TerrainHandlerSingleton:
     class TerrainHandler:
