@@ -1,5 +1,6 @@
 import pygame
 from GlobalVariables import *
+from math import *
 
 class Sprite:
     def __init__(self, filename):
@@ -56,7 +57,7 @@ class SpritesHandlerSingleton:
                     if size is not None:
                         image = pygame.transform.scale(image,size)
                     if angle is not None:
-                        image,pos = self.blitRotate(image,pos,image.get_rect().center,angle)
+                        image,pos = self.blitRotate(image,pos,image.get_rect().center,180.0 * angle / pi)
 
                     self.screen.blit(image,pos)
                     self.loadedSprites[filename].usedThisFrame = True
