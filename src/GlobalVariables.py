@@ -10,5 +10,7 @@ screenWidth = screenWidthPix / pixelsPerTile
 playerHitBoxPix = np.array([-33,33,-55,55])
 playerHitBox = playerHitBoxPix / pixelsPerTile
 
+tilePercentageForCollision = 10
+
 LEFT_CLICK = 1
 RIGHT_CLICK = 3

@@ -1,34 +1,78 @@
 from GlobalVariables import *
 from Display.SpritesHandler import *
+from Display.CameraHandler import *
+from enum import Enum
+
+class CollisionDirection(Enum):
+    UP = 0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3
 
 class Floor:
     def __init__(self,pos):
         self.pos = pos
-    def render(self,cam_x,cam_y):
-        spriteHandler = SpritesHandlerSingleton()
-        xOnScreen = screenWidthPix/2 + pixelsPerTile * (0.5 + self.pos[0] - cam_x)
-        yOnScreen = screenHeightPix/2 - pixelsPerTile * (0.5 + self.pos[1] - cam_y)
-        spriteHandler.displaySprite("tile.png",(xOnScreen,yOnScreen))
+        self.collisionDirections = [CollisionDirection.UP]
+    def render(self,spriteHandler):
+        spriteHandler.displaySprite("tile.png",self.pos)
 
-class Terrain:
+class TerrainHandlerSingleton:
+    class TerrainHandler:
+        def __init__(self):
+            self.tiles = {}
+            self.cameraHandler = CameraHandlerSingleton(None)
+            self.spriteHandler = SpritesHandlerSingleton()
+        def generate(self, width):
+            for i in range(width):
+                self.tiles[i] = {}
+                for j in range(1):
+                    self.tiles[i][j] = Floor((i,j))
+        def render(self):
+            cameraPos = self.cameraHandler.getPos()
+            xmin = int(cameraPos[0] - screenWidth/2 - 1)
+            xmax = int(cameraPos[0] + screenWidth/2 + 1)
+            for x in range(xmin,xmax):
+                if x in self.tiles:
+                    for y in self.tiles[x]:
+                        self.tiles[x][y].render(self.spriteHandler)
+
+        def getCollisions(self,pos,width,height):
+            res = []
+            xmin = int(pos[0] - width / 2.0 - 1)
+            xmax = int(pos[0] + width / 2.0 + 1)
+            for x in range(xmin,xmax):
+                if x in self.tiles:
+                    for y in self.tiles[x]:
+                        xRel = pos[0] - x
+                        yRel = pos[1] - y
+                        xRelMax = width / 2.0 + 0.5
+                        yRelMax = height / 2.0 + 0.5
+                        if abs(xRel) < xRelMax and abs(yRel) < yRelMax:
+                            collisionDirection = None
+                            xPenetration = abs(abs(xRel) - xRelMax)
+                            yPenetration = abs(abs(yRel) - yRelMax)
+                            if xPenetration > yPenetration:
+                                if yRel > 0:
+                                    collisionDirection = CollisionDirection.UP
+                                else:
+                                    collisionDirection = CollisionDirection.DOWN
+                            else:
+                                if xRel > 0:
+                                    collisionDirection = CollisionDirection.RIGHT
+                                else:
+                                    collisionDirection = CollisionDirection.LEFT
+                            res.append((self.tiles[x][y],collisionDirection))
+            return res
+
+
+    instance = None
     def __init__(self):
-        self.tiles = {}
+        if not TerrainHandlerSingleton.instance:
+            TerrainHandlerSingleton.instance = TerrainHandlerSingleton.TerrainHandler()
+
     def generate(self, width):
-        for i in range(width):
-            self.tiles[i] = {}
-            for j in range(3):
-                self.tiles[i][j] = Floor((i,j))
-    def getTile(x,y):
-        if x in self.tiles:
-            if y in self.tiles[x]:
-                return self.tiles[x][y]
-        return None
-    def render(self,cameraPos):
-        xmin = int(cameraPos[0] - screenWidth/2 - 1)
-        xmax = int(cameraPos[0] + screenWidth/2 + 1)
-        ymin = int(cameraPos[1] - screenHeight/2 - 1)
-        ymax = int(cameraPos[1] + screenHeight/2 + 1)
-        for x in range(xmin,xmax):
-            if x in self.tiles:
-                for y in self.tiles[x]:
-                    self.tiles[x][y].render(cameraPos[0],cameraPos[1])
+        TerrainHandlerSingleton.instance.generate(width)
+    def render(self):
+        TerrainHandlerSingleton.instance.render()
+    def getCollisions(self,pos,width,height):
+        return TerrainHandlerSingleton.instance.getCollisions(pos,width,height)

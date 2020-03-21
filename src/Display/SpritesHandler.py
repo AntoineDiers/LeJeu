@@ -1,6 +1,7 @@
 import pygame
 from GlobalVariables import *
 from math import *
+from Display.CameraHandler import *
 
 class Sprite:
     def __init__(self, filename):
@@ -15,10 +16,10 @@ class SpritesHandlerSingleton:
     class SpritesHandler:
         def __init__(self):
             self.loadedSprites = {}
-            pygame.init()
-            self.screen = pygame.display.set_mode((screenWidthPix, screenHeightPix))#,pygame.FULLSCREEN)
+            self.screen = pygame.display.set_mode((screenWidthPix, screenHeightPix),pygame.FULLSCREEN)
+            self.cameraHandler = CameraHandlerSingleton(None)
 
-        def blitRotate(self, image, pos, originPos, angle):
+        def rotate(self, image, pos, originPos, angle):
 
             # calcaulate the axis aligned bounding box of the rotated image
             w, h       = image.get_size()
@@ -40,27 +41,45 @@ class SpritesHandlerSingleton:
 
             return rotated_image, origin
 
+
         def displaySprite(self, filename, pos, angle, size, alpha):
-            if self.screen is not None:
-                sprite = None
-                if filename in self.loadedSprites:
-                    sprite = self.loadedSprites.get(filename)
+
+            cameraPos = self.cameraHandler.getPos()
+            posOnScreenX = screenWidthPix/2 + (pos[0] - cameraPos[0]) * pixelsPerTile
+            posOnScreenY = screenHeightPix/2 - (pos[1] - cameraPos[1]) * pixelsPerTile
+            posOnScreen = (posOnScreenX,posOnScreenY)
+
+            sprite = None
+            if filename in self.loadedSprites:
+                sprite = self.loadedSprites.get(filename)
+            else:
+                sprite = Sprite(filename)
+                if sprite.isValid:
+                    self.loadedSprites[filename] = sprite
                 else:
-                    sprite = Sprite(filename)
-                    if sprite.isValid:
-                        self.loadedSprites[filename] = sprite
-                    else:
-                        sprite = None
+                    sprite = None
+            if sprite is not None:
 
-                if sprite is not None:
-                    image = sprite.image
-                    if size is not None:
-                        image = pygame.transform.scale(image,size)
-                    if angle is not None:
-                        image,pos = self.blitRotate(image,pos,image.get_rect().center,180.0 * angle / pi)
+                image = sprite.image
 
-                    self.screen.blit(image,pos)
-                    self.loadedSprites[filename].usedThisFrame = True
+                if size is not None:
+                    image = pygame.transform.scale(image,size)
+                if angle is not None:
+                    image,posOnScreen = self.rotate(image,posOnScreen,image.get_rect().center,180.0 * angle / pi)
+                else:
+                    posOnScreen = (posOnScreenX - image.get_rect().center[0] ,posOnScreenY - image.get_rect().center[1])
+
+                if posOnScreen[0] < -image.get_rect()[2]:
+                    return
+                if posOnScreen[0] > screenWidthPix:
+                    return
+                if posOnScreen[1] < -image.get_rect()[3]:
+                    return
+                if posOnScreen[1] > screenHeightPix:
+                    return
+
+                self.screen.blit(image,posOnScreen)
+                self.loadedSprites[filename].usedThisFrame = True
 
         def drawFrame(self):
             pygame.display.flip()
